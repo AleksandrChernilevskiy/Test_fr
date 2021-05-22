@@ -1,65 +1,45 @@
 import React from 'react';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
+import Item from '../Item/items.js';
 import styles from './ItemList.module.css';
-import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import IconButton from '@material-ui/core/IconButton';
-import Checkbox from '@material-ui/core/Checkbox';
-import Grid from '@material-ui/core/Grid';
-import DeleteIcon from '@material-ui/icons/Delete';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    maxWidth: 752,
-  },
-  demo: {
-    backgroundColor: theme.palette.background.paper,
-  },
-  title: {
-    margin: theme.spacing(4, 0, 2),
-  },
-}));
-
-function generate(element) {
-  return [].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    }),
-  );
-}
-
-export default function InteractiveList() {
-  const classes = useStyles();
-  const [dense, setDense] = React.useState(false);
-  const [secondary, setSecondary] = React.useState(false);
-
+const ItemList = ({ items, onClickDone, onClickDelete}) => {
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <div className={classes.demo}>
-            <List dense={dense}>
-              {generate(
-                <ListItem>
-                  <ListItemText
-                    primary="Single-line item"
-                    secondary={secondary ? 'Secondary text' : null}
+    <Droppable droppableId={'itemlist'}>
+      {(provided) => (
+        <ul 
+          className={styles.wrap}
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+        >
+          {items.map((item, index) =>
+            <Draggable 
+              draggableId={'item-' + item.id} 
+              index={index} 
+              key={item.id}
+            >
+              {(provided) => (
+                <li
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  ref={provided.innerRef}
+                >
+                  <Item 
+                    value={item.value} 
+                    isDone={item.isDone}
+                    id={item.id}
+                    onClickDone={onClickDone}
+                    onClickDelete={onClickDelete}
                   />
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>,
+                </li>
               )}
-            </List>
-          </div>
-        </Grid>
-      </Grid>
-    </div>
-  );
-}
+            </Draggable>
+          )}
+          {provided.placeholder}
+        </ul>
+      )}
+    </Droppable>
+  )
+};
+
+export default ItemList;  
